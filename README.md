@@ -1,1 +1,1 @@
-# millionaire-kz
+# Millionaire KZ
