@@ -1,0 +1,8 @@
+name = "millionaire-kz"
+compatibility_date = "2026-10-27"
+pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "millionaire-kz-db"
+database_id = "6f4e9427-ca52-4a69-8946-8e4c69b20da2"
