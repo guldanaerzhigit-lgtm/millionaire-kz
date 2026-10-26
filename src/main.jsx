@@ -1,38 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { createRoot } from 'react-dom/client';
-import './styles.css';
-
-const questions = [
- {q:'Столица Казахстана?',a:['Алматы','Астана','Шымкент','Караганда'],correct:1},
- {q:'Сколько дней в високосном году?',a:['364','365','366','367'],correct:2},
- {q:'Какая планета известна как Красная планета?',a:['Венера','Марс','Юпитер','Меркурий'],correct:1},
- {q:'Сколько будет 12 × 8?',a:['86','92','96','108'],correct:2},
- {q:'Какой океан самый большой?',a:['Атлантический','Индийский','Северный Ледовитый','Тихий'],correct:3},
- {q:'Как называется национальная валюта Казахстана?',a:['Сом','Тенге','Рубль','Манат'],correct:1},
- {q:'Сколько сторон у шестиугольника?',a:['5','6','7','8'],correct:1},
- {q:'Какой газ необходим человеку для дыхания?',a:['Азот','Углекислый газ','Кислород','Водород'],correct:2},
- {q:'Кто написал роман «Путь Абая»?',a:['Мухтар Ауэзов','Абай Кунанбаев','Сакен Сейфуллин','Ильяс Есенберлин'],correct:0},
- {q:'Как называется процесс превращения воды в пар?',a:['Замерзание','Конденсация','Испарение','Плавление'],correct:2},
- {q:'Сколько минут в трёх часах?',a:['120','150','180','210'],correct:2},
- {q:'Какой материк самый большой?',a:['Африка','Евразия','Северная Америка','Антарктида'],correct:1},
- {q:'Какой орган перекачивает кровь?',a:['Лёгкие','Печень','Сердце','Почки'],correct:2},
- {q:'Какое число является простым?',a:['21','27','29','33'],correct:2},
- {q:'В каком году Казахстан провозгласил независимость?',a:['1989','1990','1991','1992'],correct:2}
-];
-const prizes = ['1 000 ₸','2 000 ₸','5 000 ₸','10 000 ₸','20 000 ₸','40 000 ₸','80 000 ₸','125 000 ₸','250 000 ₸','500 000 ₸','1 000 000 ₸'];
-function App(){
- const [lang,setLang]=useState('ru'), [index,setIndex]=useState(0), [selected,setSelected]=useState(null), [done,setDone]=useState(false), [lifelines,setLifelines]=useState({half:true,skip:true}), [hidden,setHidden]=useState([]);
- const kk=lang==='kk';
- const q=questions[index];
- const ladder=[...prizes].reverse();
- function choose(i){if(selected!==null||done)return;setSelected(i);setTimeout(()=>{if(i===q.correct){if(index===questions.length-1)setDone(true);else{setIndex(v=>v+1);setSelected(null);setHidden([])}}else setDone(true)},850)}
- function restart(){setIndex(0);setSelected(null);setDone(false);setHidden([]);setLifelines({half:true,skip:true})}
- function half(){if(!lifelines.half||selected!==null)return;const wrong=q.a.map((_,i)=>i).filter(i=>i!==q.correct).slice(0,2);setHidden(wrong);setLifelines(v=>({...v,half:false}))}
- function skip(){if(!lifelines.skip||selected!==null)return;if(index===questions.length-1){setDone(true);return}setIndex(v=>v+1);setSelected(null);setHidden([]);setLifelines(v=>({...v,skip:false}))}
- const earned=index===0? '0 ₸':prizes[Math.min(index-1,prizes.length-1)];
- return <main className="app"><header><div className="brand"><span className="logo">₸</span><div><h1>Millionaire <em>KZ</em></h1><p>{kk?'Біліміңді сына — миллион ұтып ал!':'Проверь знания — дойди до миллиона!'}</p></div></div><button className="lang" onClick={()=>setLang(kk?'ru':'kk')}>{kk?'ҚАЗ':'РУС'}</button></header>
- <section className="layout"><div className="game"><div className="eyebrow">{kk?'БІЛІМ ШОУЫ':'ИГРА НА ЗНАНИЯ'}</div><h2>{done?(kk?'Ойын аяқталды':'Игра завершена'):(kk?'15 сұрақ. Бір миллион.':'15 вопросов. Один миллион.')}</h2><div className="progress"><span style={{width:done?'100%':((index+1)/questions.length*100)+'%'}}/></div>
- {done?<div className="result"><div className="trophy">🏆</div><h3>{selected!==null&&selected===q.correct||index===questions.length-1?'Поздравляем!':'Хорошая попытка!'}</h3><p>{kk?'Сенің нәтижелерің':'Ваш выигрыш'}: <strong>{index===questions.length-1&&selected===q.correct?'1 000 000 ₸':earned}</strong></p><button className="primary" onClick={restart}>{kk?'Қайта ойнау':'Играть снова'}</button></div>:<><div className="question-top"><span>{kk?'СҰРАҚ':'ВОПРОС'} {index+1} / {questions.length}</span><span className="timer">⏱ 30</span></div><h3 className="question">{q.q}</h3><div className="answers">{q.a.map((a,i)=><button key={a} disabled={selected!==null||hidden.includes(i)} className={'answer '+(selected===i?(i===q.correct?'correct':'wrong'):'')} onClick={()=>choose(i)}><b>{String.fromCharCode(65+i)}</b>{hidden.includes(i)?'':a}</button>)}</div><div className="lifelines"><button disabled={!lifelines.half} onClick={half}>½ <span>{kk?'50:50':'50:50'}</span></button><button disabled={!lifelines.skip} onClick={skip}>⏭ <span>{kk?'Өткізу':'Пропуск'}</span></button><button onClick={()=>alert(kk?'Дұрыс жауапты өзің таңда!':'Доверься своим знаниям!')}>☎ <span>{kk?'Көмек':'Подсказка'}</span></button></div></>}
- </div><aside className="ladder"><div className="ladder-title">🏆 {kk?'ЖҮЛДЕ ҚОРЫ':'ПРИЗОВАЯ ЛЕСТНИЦА'}</div>{ladder.map((p,i)=><div key={p} className={'step '+(prizes.length-1-i===index?'active':'')+(i>=prizes.length-3?' safe':'')}><span>{String(prizes.length-i).padStart(2,'0')}</span><b>{p}</b></div>)}</aside></section><footer><span>© 2026 Millionaire KZ</span><span>{kk?'Оқу-ойын жобасы':'Образовательная игра'}</span></footer></main>
-}
-createRoot(document.getElementById('root')).render(<App/>);
+import React,{useState} from 'react';import{createRoot}from'react-dom/client';import'./styles.css';
+const qs=[
+['Столица Казахстана?',['Алматы','Астана','Шымкент','Караганда'],1],
+['Сколько дней в високосном году?',['364','365','366','367'],2],
+['Какая планета известна как Красная планета?',['Венера','Марс','Юпитер','Меркурий'],1],
+['Сколько будет 12 × 8?',['86','92','96','108'],2],
+['Какой океан самый большой?',['Атлантический','Индийский','Северный Ледовитый','Тихий'],3],
+['Национальная валюта Казахстана?',['Сом','Тенге','Рубль','Манат'],1],
+['Сколько сторон у шестиугольника?',['5','6','7','8'],1],
+['Какой газ нужен человеку для дыхания?',['Азот','Углекислый газ','Кислород','Водород'],2],
+['Кто написал «Путь Абая»?',['Мухтар Ауэзов','Абай Кунанбаев','Сакен Сейфуллин','Ильяс Есенберлин'],0],
+['Как называется превращение воды в пар?',['Замерзание','Конденсация','Испарение','Плавление'],2],
+['Сколько минут в трёх часах?',['120','150','180','210'],2],
+['Какой материк самый большой?',['Африка','Евразия','Северная Америка','Антарктида'],1],
+['Какой орган перекачивает кровь?',['Лёгкие','Печень','Сердце','Почки'],2],
+['Какое число простое?',['21','27','29','33'],2],
+['В каком году Казахстан провозгласил независимость?',['1989','1990','1991','1992'],2]];
+const money=['1 000 ₸','2 000 ₸','5 000 ₸','10 000 ₸','20 000 ₸','40 000 ₸','80 000 ₸','125 000 ₸','250 000 ₸','500 000 ₸','1 000 000 ₸'];
+function App(){const [n,S]=useState(0),[pick,P]=useState(null),[end,E]=useState(false),[half,H]=useState(true),[skip,K]=useState(true),[hidden,D]=useState([]),[lang,L]=useState('ru');const kk=lang==='kk',q=qs[n];function answer(i){if(pick!==null||end)return;P(i);setTimeout(()=>{if(i!==q[2])E(true);else if(n===qs.length-1)E(true);else{S(n+1);P(null);D([])}},650)}function reset(){S(0);P(null);E(false);H(true);K(true);D([])}function lifeline(){if(!half||pick!==null)return;D(q[1].map((_,i)=>i).filter(i=>i!==q[2]).slice(0,2));H(false)}function skipQ(){if(!skip||pick!==null)return;K(false);if(n===qs.length-1)E(true);else{S(n+1);D([])}}const prize=n===0?'0 ₸':money[Math.min(n-1,money.length-1)];return <main><header><div className="mark">₸</div><div className="brand"><h1>Millionaire <i>KZ</i></h1><p>{kk?'Біліміңді сына — миллион ұтып ал!':'Проверь знания — дойди до миллиона!'}</p></div><button className="lang" onClick={()=>L(kk?'ru':'kk')}>{kk?'ҚАЗ':'РУС'}</button></header><div className="grid"><section className="game"><small>✦ {kk?'БІЛІМ ШОУЫ':'ИГРА НА ЗНАНИЯ'}</small><h2>{end?(kk?'Ойын аяқталды':'Игра завершена'):(kk?'15 сұрақ. Бір миллион.':'15 вопросов. Один миллион.')}</h2><div className="bar"><span style={{width:(end?100:(n+1)/qs.length*100)+'%'}}/></div>{end?<div className="result"><div className="cup">🏆</div><h2>{pick===q[2]&&n===qs.length-1?'Поздравляем!':'Игра завершена!'}</h2><p>Ваш результат: <b>{pick===q[2]&&n===qs.length-1?'1 000 000 ₸':prize}</b></p><button className="gold" onClick={reset}>Играть снова</button></div>:<><div className="qtop"><span>ВОПРОС {n+1} / {qs.length}</span><span className="timer">◷ 30</span></div><h3>{q[0]}</h3><div className="answers">{q[1].map((a,i)=><button key={a} disabled={pick!==null||hidden.includes(i)} className={'answer '+(pick===i?(i===q[2]?'right':'wrong'):'')} onClick={()=>answer(i)}><b>{'ABCD'[i]}</b>{hidden.includes(i)?'':a}</button>)}</div><div className="hints"><button disabled={!half} onClick={lifeline}>½ <span>50:50</span></button><button disabled={!skip} onClick={skipQ}>⏭ <span>Пропуск</span></button><button onClick={()=>alert('Доверься своим знаниям!')}>☎ <span>Подсказка</span></button></div></>}</section><aside><h4>🏆 ПРИЗОВАЯ ЛЕСТНИЦА</h4>{[...money].reverse().map((m,i)=><div className={'step '+(money.length-1-i===n?'active':'')} key={m}><span>{String(money.length-i).padStart(2,'0')}</span><b>{m}</b></div>)}</aside></div><footer>© 2026 Millionaire KZ <span>Образовательная игра</span></footer></main>}createRoot(document.getElementById('root')).render(<App/>);
